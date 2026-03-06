@@ -37,10 +37,6 @@ set(PROJECT_SOURCES
     src/models/ModelListModel.cpp
 )
 
-if (WIN32)
-    list(APPEND PROJECT_SOURCES app_icon.rc)
-endif()
-
 if(WIN32)
     list(APPEND PROJECT_SOURCES app_icon.rc)
 endif()

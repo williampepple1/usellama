@@ -23,6 +23,14 @@ ApplicationWindow {
 
     Component.onCompleted: {
         OllamaClient.checkConnection()
+        if (startupFolder && startupFolder.length > 0) {
+            root.workspacePath = startupFolder
+            FileSystemManager.setRootPath(startupFolder)
+            WorkspaceManager.openWorkspace(startupFolder)
+            if (startupFile && startupFile.length > 0) {
+                Qt.callLater(function() { editorArea.openFile(startupFile) })
+            }
+        }
     }
 
     FolderDialog {

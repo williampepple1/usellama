@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QIcon>
+#include <QFileInfo>
 
 #include "src/core/OllamaClient.h"
 #include "src/core/FileSystemManager.h"
@@ -57,8 +58,28 @@ int main(int argc, char *argv[])
         terminalProcess->setWorkingDirectory(fileSystemManager->rootPath());
     });
 
+    QString startupFolder;
+    QString startupFile;
+    const QStringList args = app.arguments();
+    if (args.size() > 1) {
+        QString arg = args.at(1);
+        QFileInfo info(arg);
+        if (info.exists()) {
+            if (info.isDir()) {
+                startupFolder = info.absoluteFilePath();
+            } else {
+                startupFile = info.absoluteFilePath();
+                startupFolder = info.absolutePath();
+            }
+        }
+    }
+
     QQmlApplicationEngine engine;
 
+    engine.rootContext()->setContextProperty("startupFolder", startupFolder);
+    engine.rootContext()->setContextProperty("startupFile", startupFile);
+
+    qmlRegisterType<SyntaxHighlighter>("usellama", 1, 0, "SyntaxHighlighter");
     qmlRegisterSingletonInstance("usellama", 1, 0, "OllamaClient", ollamaClient);
     qmlRegisterSingletonInstance("usellama", 1, 0, "FileSystemManager", fileSystemManager);
     qmlRegisterSingletonInstance("usellama", 1, 0, "AgentEngine", agentEngine);

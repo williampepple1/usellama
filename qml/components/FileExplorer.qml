@@ -61,9 +61,37 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             model: FileTreeModel
-            rootIndex: FileTreeModel.rootModelIndex()
             clip: true
             boundsBehavior: Flickable.StopAtBounds
+
+            function refreshRoot() {
+                var idx = FileTreeModel.rootModelIndex()
+                if (idx.valid) {
+                    treeView.rootIndex = idx
+                }
+            }
+
+            Timer {
+                id: refreshTimer
+                interval: 200
+                repeat: false
+                onTriggered: treeView.refreshRoot()
+            }
+
+            Connections {
+                target: FileTreeModel
+                function onRootDirectoryChanged() {
+                    treeView.refreshRoot()
+                    refreshTimer.restart()
+                }
+                function onDirectoryLoaded() {
+                    treeView.refreshRoot()
+                }
+            }
+
+            Component.onCompleted: {
+                refreshRoot()
+            }
 
             ScrollBar.vertical: ScrollBar {
                 policy: ScrollBar.AsNeeded
