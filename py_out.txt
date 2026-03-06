@@ -1,1 +1,22 @@
 Collecting Pillow
+  Downloading pillow-12.1.1-cp313-cp313-win_amd64.whl.metadata (9.0 kB)
+Downloading pillow-12.1.1-cp313-cp313-win_amd64.whl (7.0 MB)
+   ---------------------------------------- 7.0/7.0 MB 9.1 MB/s  0:00:01
+Installing collected packages: Pillow
+Successfully installed Pillow-12.1.1
+
+[notice] A new release of pip is available: 25.3 -> 26.0.1
+[notice] To update, run: C:\Users\PC\AppData\Local\Programs\Python\Python313\python.exe -m pip install --upgrade pip
+Traceback (most recent call last):
+  File "c:\Users\PC\Documents\GitHub\usellama\convert_icon.py", line 9, in <module>
+    print("DONE", file=open("py_out.txt", "w"))
+                       ~~~~^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'py_out.txt'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\PC\Documents\GitHub\usellama\convert_icon.py", line 11, in <module>
+    print("ERR: " + str(e), file=open("py_out.txt", "w"))
+                                 ~~~~^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'py_out.txt'

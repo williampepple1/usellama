@@ -19,8 +19,8 @@ RequestExecutionLevel admin
 !include "FileFunc.nsh"
 
 ; Interface settings
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+!define MUI_ICON "app_icon.ico"
+!define MUI_UNICON "app_icon.ico"
 !define MUI_HEADERIMAGE
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Wizard\win.bmp"
