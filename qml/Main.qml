@@ -239,7 +239,7 @@ ApplicationWindow {
                 Layout.alignment: Qt.AlignHCenter
             }
             Text {
-                text: "Version 0.1"
+                text: "Version 1.0.0"
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.textMuted
                 Layout.alignment: Qt.AlignHCenter
