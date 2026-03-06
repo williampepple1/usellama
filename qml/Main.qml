@@ -49,6 +49,28 @@ ApplicationWindow {
         }
     }
 
+    FileDialog {
+        id: openFileDialog
+        title: "Open File"
+        fileMode: FileDialog.OpenFile
+        nameFilters: ["All files (*)"]
+        onAccepted: {
+            let filePath = selectedFile.toString()
+            if (Qt.platform.os === "windows") {
+                filePath = filePath.replace("file:///", "")
+            } else {
+                filePath = filePath.replace("file://", "")
+            }
+            let folderPath = filePath.substring(0, filePath.lastIndexOf(Qt.platform.os === "windows" ? "/" : "/"))
+            if (!root.workspacePath || root.workspacePath.length === 0) {
+                root.workspacePath = folderPath
+                FileSystemManager.setRootPath(folderPath)
+                WorkspaceManager.openWorkspace(folderPath)
+            }
+            Qt.callLater(function() { editorArea.openFile(filePath) })
+        }
+    }
+
     Shortcut {
         sequence: "Ctrl+P"
         onActivated: {
@@ -77,6 +99,11 @@ ApplicationWindow {
                 text: "&Open Folder..."
                 shortcut: "Ctrl+O"
                 onTriggered: folderDialog.open()
+            }
+            Action {
+                text: "Open &File..."
+                shortcut: "Ctrl+Shift+O"
+                onTriggered: openFileDialog.open()
             }
             Action {
                 text: "&Quick Open..."
@@ -226,6 +253,7 @@ ApplicationWindow {
         visible: root.showWelcome
         z: 10
         onOpenFolder: folderDialog.open()
+        onOpenFile: openFileDialog.open()
         onOpenRecent: function(path) {
             root.workspacePath = path
             FileSystemManager.setRootPath(path)

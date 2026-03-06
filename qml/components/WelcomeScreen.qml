@@ -9,6 +9,7 @@ Rectangle {
     color: Theme.bgTertiary
 
     signal openFolder()
+    signal openFile()
     signal openRecent(string path)
 
     ColumnLayout {
@@ -100,27 +101,55 @@ Rectangle {
             Layout.bottomMargin: Theme.spacingMd
         }
 
-        Button {
+        RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 280
-            Layout.preferredHeight: 48
-            text: "Open Folder"
-            font.pixelSize: Theme.fontSizeLarge
+            spacing: Theme.spacingMd
 
-            background: Rectangle {
-                radius: Theme.radiusMd
-                color: parent.hovered ? Theme.accentHover : Theme.accent
+            Button {
+                Layout.preferredWidth: 180
+                Layout.preferredHeight: 48
+                text: "Open Folder"
+                font.pixelSize: Theme.fontSizeLarge
+
+                background: Rectangle {
+                    radius: Theme.radiusMd
+                    color: parent.hovered ? Theme.accentHover : Theme.accent
+                }
+
+                contentItem: Text {
+                    text: parent.text
+                    font: parent.font
+                    color: Theme.textInverse
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: welcomeRoot.openFolder()
             }
 
-            contentItem: Text {
-                text: parent.text
-                font: parent.font
-                color: Theme.textInverse
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
+            Button {
+                Layout.preferredWidth: 180
+                Layout.preferredHeight: 48
+                text: "Open File"
+                font.pixelSize: Theme.fontSizeLarge
 
-            onClicked: welcomeRoot.openFolder()
+                background: Rectangle {
+                    radius: Theme.radiusMd
+                    color: parent.hovered ? Theme.bgHover : Theme.bgSurface
+                    border.color: Theme.accent
+                    border.width: 1
+                }
+
+                contentItem: Text {
+                    text: parent.text
+                    font: parent.font
+                    color: Theme.accent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: welcomeRoot.openFile()
+            }
         }
 
         ColumnLayout {

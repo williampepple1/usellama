@@ -33,6 +33,7 @@ public:
 
 signals:
     void rootDirectoryChanged();
+    void rootReady();
 
 private:
     QString m_rootDir;

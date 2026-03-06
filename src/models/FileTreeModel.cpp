@@ -6,6 +6,11 @@ FileTreeModel::FileTreeModel(QObject *parent)
 {
     setFilter(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::AllDirs);
     setNameFilterDisables(false);
+
+    connect(this, &QFileSystemModel::directoryLoaded, this, [this](const QString &path) {
+        if (path == m_rootDir)
+            emit rootReady();
+    });
 }
 
 QHash<int, QByteArray> FileTreeModel::roleNames() const
@@ -39,11 +44,9 @@ QVariant FileTreeModel::data(const QModelIndex &index, int role) const
 
 void FileTreeModel::setRootDirectory(const QString &path)
 {
-    if (m_rootDir != path) {
-        m_rootDir = path;
-        setRootPath(path);
-        emit rootDirectoryChanged();
-    }
+    m_rootDir = path;
+    setRootPath(path);
+    emit rootDirectoryChanged();
 }
 
 QModelIndex FileTreeModel::rootModelIndex() const
