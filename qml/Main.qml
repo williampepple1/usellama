@@ -13,7 +13,7 @@ ApplicationWindow {
     minimumWidth: 900
     minimumHeight: 600
     visible: true
-    title: workspacePath.length > 0 ? "UseLlama — " + workspacePath : "UseLlama"
+    title: workspacePath.length > 0 ? "UseLlama \u2014 " + workspacePath : "UseLlama"
     color: Theme.bgTertiary
 
     property string workspacePath: ""
@@ -41,6 +41,22 @@ ApplicationWindow {
         }
     }
 
+    Shortcut {
+        sequence: "Ctrl+P"
+        onActivated: {
+            if (!root.showWelcome)
+                quickOpenDialog.open()
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Shift+F"
+        onActivated: {
+            if (!root.showWelcome)
+                globalSearchDialog.open()
+        }
+    }
+
     menuBar: MenuBar {
         palette.window: Theme.bgSecondary
         palette.windowText: Theme.textPrimary
@@ -54,17 +70,43 @@ ApplicationWindow {
                 shortcut: "Ctrl+O"
                 onTriggered: folderDialog.open()
             }
+            Action {
+                text: "&Quick Open..."
+                shortcut: "Ctrl+P"
+                enabled: !root.showWelcome
+                onTriggered: quickOpenDialog.open()
+            }
             MenuSeparator {}
             Action {
-                text: "&Settings"
+                text: "&Save Chat History"
+                enabled: !root.showWelcome
+                onTriggered: saveChatDialog.open()
+            }
+            Action {
+                text: "&Load Chat History"
+                enabled: !root.showWelcome
+                onTriggered: loadChatDialog.open()
+            }
+            MenuSeparator {}
+            Action {
+                text: "S&ettings"
                 shortcut: "Ctrl+,"
                 onTriggered: settingsDialog.open()
             }
             MenuSeparator {}
             Action {
-                text: "&Exit"
+                text: "E&xit"
                 shortcut: "Ctrl+Q"
                 onTriggered: Qt.quit()
+            }
+        }
+        Menu {
+            title: "&Edit"
+            Action {
+                text: "Search in &Files..."
+                shortcut: "Ctrl+Shift+F"
+                enabled: !root.showWelcome
+                onTriggered: globalSearchDialog.open()
             }
         }
         Menu {
@@ -89,8 +131,44 @@ ApplicationWindow {
         }
     }
 
+    FileDialog {
+        id: saveChatDialog
+        title: "Save Chat History"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["JSON files (*.json)"]
+        onAccepted: {
+            let path = selectedFile.toString().replace("file:///", "")
+            AgentEngine.saveChatHistory(path)
+        }
+    }
+
+    FileDialog {
+        id: loadChatDialog
+        title: "Load Chat History"
+        fileMode: FileDialog.OpenFile
+        nameFilters: ["JSON files (*.json)"]
+        onAccepted: {
+            let path = selectedFile.toString().replace("file:///", "")
+            AgentEngine.loadChatHistory(path)
+        }
+    }
+
     SettingsDialog {
         id: settingsDialog
+    }
+
+    QuickOpenDialog {
+        id: quickOpenDialog
+        onFileChosen: function(filePath) {
+            editorArea.openFile(filePath)
+        }
+    }
+
+    GlobalSearchDialog {
+        id: globalSearchDialog
+        onResultSelected: function(filePath) {
+            editorArea.openFile(filePath)
+        }
     }
 
     Dialog {
