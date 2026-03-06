@@ -64,16 +64,22 @@ Rectangle {
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
+            property int retryCount: 0
+
             function refreshRoot() {
                 var idx = FileTreeModel.rootModelIndex()
                 if (idx.valid) {
                     treeView.rootIndex = idx
+                    treeView.retryCount = 0
+                } else if (treeView.retryCount < 10) {
+                    treeView.retryCount++
+                    retryTimer.restart()
                 }
             }
 
             Timer {
-                id: refreshTimer
-                interval: 200
+                id: retryTimer
+                interval: 150
                 repeat: false
                 onTriggered: treeView.refreshRoot()
             }
@@ -81,10 +87,14 @@ Rectangle {
             Connections {
                 target: FileTreeModel
                 function onRootDirectoryChanged() {
+                    treeView.retryCount = 0
                     treeView.refreshRoot()
-                    refreshTimer.restart()
+                    retryTimer.restart()
                 }
-                function onDirectoryLoaded() {
+                function onLayoutChanged() {
+                    treeView.refreshRoot()
+                }
+                function onRowsInserted() {
                     treeView.refreshRoot()
                 }
             }
