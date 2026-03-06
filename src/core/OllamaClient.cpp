@@ -13,8 +13,11 @@ OllamaClient::OllamaClient(QObject *parent)
 
 void OllamaClient::setBaseUrl(const QString &url)
 {
-    if (m_baseUrl != url) {
-        m_baseUrl = url;
+    QString cleanUrl = url.trimmed();
+    while (cleanUrl.endsWith('/'))
+        cleanUrl.chop(1);
+    if (m_baseUrl != cleanUrl) {
+        m_baseUrl = cleanUrl;
         emit baseUrlChanged();
         m_connected = false;
         emit connectedChanged();
@@ -93,6 +96,11 @@ void OllamaClient::fetchModels()
 
 void OllamaClient::sendChatMessage(const QJsonArray &messages, const QJsonArray &tools)
 {
+    if (m_currentModel.isEmpty()) {
+        emit errorOccurred("No model selected. Open Settings and check your Ollama connection, or select a model from the dropdown.");
+        return;
+    }
+
     cancelRequest();
 
     QJsonObject body;
@@ -167,7 +175,23 @@ void OllamaClient::onStreamFinished()
 
     if (m_activeReply->error() != QNetworkReply::NoError &&
         m_activeReply->error() != QNetworkReply::OperationCanceledError) {
-        emit errorOccurred(m_activeReply->errorString());
+        QString errMsg = "Error transferring " + m_activeReply->url().toString();
+        int status = m_activeReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        QByteArray body = m_activeReply->readAll();
+        if (status > 0) {
+            errMsg += " (HTTP " + QString::number(status) + ")";
+        }
+        if (!body.isEmpty()) {
+            QJsonDocument doc = QJsonDocument::fromJson(body);
+            if (doc.isObject() && doc.object().contains("error")) {
+                errMsg += ": " + doc.object()["error"].toString();
+            } else {
+                QString bodyStr = QString::fromUtf8(body).left(200).trimmed();
+                if (!bodyStr.isEmpty())
+                    errMsg += ": " + bodyStr;
+            }
+        }
+        emit errorOccurred(errMsg);
     }
 
     QJsonObject fullResponse;
