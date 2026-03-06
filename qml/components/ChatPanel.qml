@@ -195,19 +195,20 @@ Rectangle {
 
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: inputArea.implicitHeight + Theme.spacingMd * 2
-            Layout.minimumHeight: 60
-            Layout.maximumHeight: 200
+            Layout.minimumHeight: 120
+            Layout.preferredHeight: Math.max(120, inputArea.implicitHeight + 70)
+            Layout.maximumHeight: 250
             color: Theme.bgTertiary
 
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: Theme.spacingSm
-                spacing: Theme.spacingXs
+                spacing: Theme.spacingSm
 
                 ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Layout.minimumHeight: 50
 
                     TextArea {
                         id: inputArea
@@ -236,6 +237,7 @@ Rectangle {
                 }
 
                 RowLayout {
+                    Layout.fillWidth: true
                     spacing: Theme.spacingSm
 
                     Text {
