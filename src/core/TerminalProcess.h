@@ -8,8 +8,6 @@
 class TerminalProcess : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
-    QML_SINGLETON
 
     Q_PROPERTY(QString output READ output NOTIFY outputChanged)
     Q_PROPERTY(bool running READ isRunning NOTIFY runningChanged)

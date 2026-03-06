@@ -9,8 +9,6 @@
 class WorkspaceManager : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
-    QML_SINGLETON
 
     Q_PROPERTY(QStringList recentWorkspaces READ recentWorkspaces NOTIFY recentWorkspacesChanged)
     Q_PROPERTY(QString currentWorkspace READ currentWorkspace NOTIFY currentWorkspaceChanged)

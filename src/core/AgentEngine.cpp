@@ -1,6 +1,8 @@
 #include "AgentEngine.h"
 #include "OllamaClient.h"
 #include "AgentTools.h"
+#include <QFile>
+#include <QJsonDocument>
 
 AgentEngine::AgentEngine(QObject *parent)
     : QObject(parent)
@@ -58,6 +60,25 @@ void AgentEngine::cancelAgent()
 void AgentEngine::clearHistory()
 {
     m_conversationHistory = QJsonArray();
+}
+
+void AgentEngine::saveChatHistory(const QString &filePath)
+{
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly)) {
+        QJsonDocument doc(m_conversationHistory);
+        file.write(doc.toJson());
+    }
+}
+
+void AgentEngine::loadChatHistory(const QString &filePath)
+{
+    QFile file(filePath);
+    if (file.open(QIODevice::ReadOnly)) {
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+        if (doc.isArray())
+            m_conversationHistory = doc.array();
+    }
 }
 
 void AgentEngine::executeAgentLoop()

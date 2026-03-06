@@ -7,8 +7,6 @@
 class ChatHistoryModel : public QAbstractListModel
 {
     Q_OBJECT
-    QML_ELEMENT
-    QML_SINGLETON
 
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
 

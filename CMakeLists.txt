@@ -10,20 +10,34 @@ find_package(Qt6 REQUIRED COMPONENTS Quick Widgets Network)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-qt_add_executable(appusellama
+set(PROJECT_SOURCES
     main.cpp
+    src/core/OllamaClient.h
     src/core/OllamaClient.cpp
+    src/core/FileSystemManager.h
     src/core/FileSystemManager.cpp
+    src/core/SyntaxHighlighter.h
     src/core/SyntaxHighlighter.cpp
+    src/core/AgentEngine.h
     src/core/AgentEngine.cpp
+    src/core/AgentTools.h
     src/core/AgentTools.cpp
+    src/core/TerminalProcess.h
     src/core/TerminalProcess.cpp
+    src/core/WorkspaceManager.h
     src/core/WorkspaceManager.cpp
+    src/core/Settings.h
     src/core/Settings.cpp
+    src/models/ChatMessage.h
+    src/models/FileTreeModel.h
     src/models/FileTreeModel.cpp
+    src/models/ChatHistoryModel.h
     src/models/ChatHistoryModel.cpp
+    src/models/ModelListModel.h
     src/models/ModelListModel.cpp
 )
+
+qt_add_executable(appusellama ${PROJECT_SOURCES})
 
 qt_add_qml_module(appusellama
     URI usellama
@@ -41,19 +55,11 @@ qt_add_qml_module(appusellama
         qml/components/WelcomeScreen.qml
         qml/components/ToolCallCard.qml
         qml/components/MessageBubble.qml
+        qml/components/QuickOpenDialog.qml
+        qml/components/GlobalSearchDialog.qml
     SOURCES
-        src/core/OllamaClient.h
-        src/core/FileSystemManager.h
         src/core/SyntaxHighlighter.h
-        src/core/AgentEngine.h
-        src/core/AgentTools.h
-        src/core/TerminalProcess.h
-        src/core/WorkspaceManager.h
-        src/core/Settings.h
-        src/models/ChatMessage.h
-        src/models/FileTreeModel.h
-        src/models/ChatHistoryModel.h
-        src/models/ModelListModel.h
+        src/core/SyntaxHighlighter.cpp
 )
 
 set_target_properties(appusellama PROPERTIES
@@ -63,11 +69,17 @@ set_target_properties(appusellama PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+target_include_directories(appusellama PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/models
+)
+
 target_link_libraries(appusellama
     PRIVATE
         Qt6::Quick
         Qt6::Widgets
         Qt6::Network
+        Qt6::Gui
 )
 
 include(GNUInstallDirs)

@@ -12,8 +12,6 @@ class AgentTools;
 class AgentEngine : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
-    QML_SINGLETON
 
     Q_PROPERTY(bool running READ isRunning NOTIFY runningChanged)
 
@@ -28,6 +26,8 @@ public:
     Q_INVOKABLE void sendMessage(const QString &userMessage, const QString &workspacePath);
     Q_INVOKABLE void cancelAgent();
     Q_INVOKABLE void clearHistory();
+    Q_INVOKABLE void saveChatHistory(const QString &filePath);
+    Q_INVOKABLE void loadChatHistory(const QString &filePath);
 
 signals:
     void runningChanged();

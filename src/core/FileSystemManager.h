@@ -8,8 +8,6 @@
 class FileSystemManager : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
-    QML_SINGLETON
 
     Q_PROPERTY(QString rootPath READ rootPath NOTIFY rootPathChanged)
 

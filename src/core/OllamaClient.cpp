@@ -4,7 +4,11 @@ OllamaClient::OllamaClient(QObject *parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
     , m_baseUrl("http://localhost:11434")
+    , m_reconnectTimer(new QTimer(this))
 {
+    m_reconnectTimer->setInterval(10000);
+    connect(m_reconnectTimer, &QTimer::timeout, this, &OllamaClient::checkConnection);
+    startAutoReconnect();
 }
 
 void OllamaClient::setBaseUrl(const QString &url)
@@ -156,4 +160,15 @@ void OllamaClient::onStreamFinished()
 
     m_activeReply->deleteLater();
     m_activeReply = nullptr;
+}
+
+void OllamaClient::startAutoReconnect()
+{
+    if (!m_reconnectTimer->isActive())
+        m_reconnectTimer->start();
+}
+
+void OllamaClient::stopAutoReconnect()
+{
+    m_reconnectTimer->stop();
 }

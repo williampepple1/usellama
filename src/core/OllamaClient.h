@@ -8,13 +8,12 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QUrl>
+#include <QTimer>
 #include <QQmlEngine>
 
 class OllamaClient : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
-    QML_SINGLETON
 
     Q_PROPERTY(QString baseUrl READ baseUrl WRITE setBaseUrl NOTIFY baseUrlChanged)
     Q_PROPERTY(bool connected READ isConnected NOTIFY connectedChanged)
@@ -38,6 +37,8 @@ public:
     Q_INVOKABLE void fetchModels();
     Q_INVOKABLE void sendChatMessage(const QJsonArray &messages, const QJsonArray &tools = QJsonArray());
     Q_INVOKABLE void cancelRequest();
+    Q_INVOKABLE void startAutoReconnect();
+    Q_INVOKABLE void stopAutoReconnect();
 
 signals:
     void baseUrlChanged();
@@ -65,6 +66,7 @@ private:
     QByteArray m_streamBuffer;
     QString m_accumulatedContent;
     QJsonArray m_accumulatedToolCalls;
+    QTimer *m_reconnectTimer = nullptr;
 };
 
 #endif // OLLAMACLIENT_H
