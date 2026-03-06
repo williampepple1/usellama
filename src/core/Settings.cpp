@@ -100,3 +100,16 @@ void Settings::setColorTheme(const QString &theme)
         emit colorThemeChanged();
     }
 }
+
+QString Settings::apiMode() const
+{
+    return m_settings.value("ollama/apiMode", "local").toString();
+}
+
+void Settings::setApiMode(const QString &mode)
+{
+    if (apiMode() != mode) {
+        m_settings.setValue("ollama/apiMode", mode);
+        emit apiModeChanged();
+    }
+}

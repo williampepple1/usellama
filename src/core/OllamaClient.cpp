@@ -34,6 +34,17 @@ void OllamaClient::setApiKey(const QString &key)
     }
 }
 
+void OllamaClient::setApiMode(const QString &mode)
+{
+    if (m_apiMode != mode) {
+        m_apiMode = mode;
+        emit apiModeChanged();
+        m_connected = false;
+        emit connectedChanged();
+        checkConnection();
+    }
+}
+
 void OllamaClient::setCurrentModel(const QString &model)
 {
     if (m_currentModel != model) {
@@ -56,7 +67,8 @@ void OllamaClient::applyAuth(QNetworkRequest &req) const
 
 void OllamaClient::checkConnection()
 {
-    QNetworkRequest req(apiUrl("/api/tags"));
+    QString endpoint = isCloudMode() ? "/v1/models" : "/api/tags";
+    QNetworkRequest req(apiUrl(endpoint));
     applyAuth(req);
     QNetworkReply *reply = m_nam->get(req);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
@@ -72,7 +84,8 @@ void OllamaClient::checkConnection()
 
 void OllamaClient::fetchModels()
 {
-    QNetworkRequest req(apiUrl("/api/tags"));
+    QString endpoint = isCloudMode() ? "/v1/models" : "/api/tags";
+    QNetworkRequest req(apiUrl(endpoint));
     applyAuth(req);
     QNetworkReply *reply = m_nam->get(req);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
@@ -82,11 +95,20 @@ void OllamaClient::fetchModels()
             return;
         }
         QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-        QJsonArray models = doc.object()["models"].toArray();
         m_availableModels.clear();
-        for (const QJsonValue &v : models) {
-            m_availableModels.append(v.toObject()["name"].toString());
+
+        if (isCloudMode()) {
+            QJsonArray models = doc.object()["data"].toArray();
+            for (const QJsonValue &v : models) {
+                m_availableModels.append(v.toObject()["id"].toString());
+            }
+        } else {
+            QJsonArray models = doc.object()["models"].toArray();
+            for (const QJsonValue &v : models) {
+                m_availableModels.append(v.toObject()["name"].toString());
+            }
         }
+
         emit availableModelsChanged();
         if (!m_availableModels.isEmpty() && m_currentModel.isEmpty()) {
             setCurrentModel(m_availableModels.first());
@@ -107,10 +129,25 @@ void OllamaClient::sendChatMessage(const QJsonArray &messages, const QJsonArray 
     body["model"] = m_currentModel;
     body["messages"] = messages;
     body["stream"] = true;
-    if (!tools.isEmpty())
-        body["tools"] = tools;
 
-    QNetworkRequest req(apiUrl("/api/chat"));
+    if (isCloudMode()) {
+        if (!tools.isEmpty()) {
+            QJsonArray openaiTools;
+            for (const QJsonValue &t : tools) {
+                QJsonObject tool;
+                tool["type"] = "function";
+                tool["function"] = t.toObject();
+                openaiTools.append(tool);
+            }
+            body["tools"] = openaiTools;
+        }
+    } else {
+        if (!tools.isEmpty())
+            body["tools"] = tools;
+    }
+
+    QString endpoint = isCloudMode() ? "/v1/chat/completions" : "/api/chat";
+    QNetworkRequest req(apiUrl(endpoint));
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     applyAuth(req);
 
@@ -147,23 +184,59 @@ void OllamaClient::onStreamReadyRead()
 
         if (line.isEmpty()) continue;
 
-        QJsonDocument doc = QJsonDocument::fromJson(line);
-        if (doc.isNull()) continue;
+        if (isCloudMode()) {
+            // OpenAI SSE format: "data: {...}"
+            if (line.startsWith("data: ")) {
+                line = line.mid(6);
+            } else {
+                continue;
+            }
+            if (line == "[DONE]") continue;
 
-        QJsonObject obj = doc.object();
-        QJsonObject message = obj["message"].toObject();
-        QString content = message["content"].toString();
+            QJsonDocument doc = QJsonDocument::fromJson(line);
+            if (doc.isNull()) continue;
 
-        if (!content.isEmpty()) {
-            m_accumulatedContent += content;
-            emit streamToken(content);
-        }
+            QJsonObject obj = doc.object();
+            QJsonArray choices = obj["choices"].toArray();
+            if (choices.isEmpty()) continue;
 
-        QJsonArray toolCalls = message["tool_calls"].toArray();
-        if (!toolCalls.isEmpty()) {
-            for (const QJsonValue &tc : toolCalls) {
-                m_accumulatedToolCalls.append(tc);
-                emit streamToolCall(tc.toObject());
+            QJsonObject choice = choices[0].toObject();
+            QJsonObject delta = choice["delta"].toObject();
+
+            QString content = delta["content"].toString();
+            if (!content.isEmpty()) {
+                m_accumulatedContent += content;
+                emit streamToken(content);
+            }
+
+            QJsonArray toolCalls = delta["tool_calls"].toArray();
+            if (!toolCalls.isEmpty()) {
+                for (const QJsonValue &tc : toolCalls) {
+                    QJsonObject tcObj = tc.toObject();
+                    m_accumulatedToolCalls.append(tcObj);
+                    emit streamToolCall(tcObj);
+                }
+            }
+        } else {
+            // Native Ollama format: one JSON object per line
+            QJsonDocument doc = QJsonDocument::fromJson(line);
+            if (doc.isNull()) continue;
+
+            QJsonObject obj = doc.object();
+            QJsonObject message = obj["message"].toObject();
+            QString content = message["content"].toString();
+
+            if (!content.isEmpty()) {
+                m_accumulatedContent += content;
+                emit streamToken(content);
+            }
+
+            QJsonArray toolCalls = message["tool_calls"].toArray();
+            if (!toolCalls.isEmpty()) {
+                for (const QJsonValue &tc : toolCalls) {
+                    m_accumulatedToolCalls.append(tc);
+                    emit streamToolCall(tc.toObject());
+                }
             }
         }
     }

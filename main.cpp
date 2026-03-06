@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
     agentEngine->setOllamaClient(ollamaClient);
     agentEngine->setAgentTools(agentTools);
 
+    ollamaClient->setApiMode(settings->apiMode());
     ollamaClient->setBaseUrl(settings->ollamaUrl());
     ollamaClient->setApiKey(settings->apiKey());
     QObject::connect(settings, &Settings::ollamaUrlChanged, ollamaClient, [settings, ollamaClient]() {
@@ -47,6 +48,9 @@ int main(int argc, char *argv[])
     });
     QObject::connect(settings, &Settings::apiKeyChanged, ollamaClient, [settings, ollamaClient]() {
         ollamaClient->setApiKey(settings->apiKey());
+    });
+    QObject::connect(settings, &Settings::apiModeChanged, ollamaClient, [settings, ollamaClient]() {
+        ollamaClient->setApiMode(settings->apiMode());
     });
     QObject::connect(ollamaClient, &OllamaClient::availableModelsChanged, modelListModel, [ollamaClient, modelListModel]() {
         modelListModel->setModels(ollamaClient->availableModels());

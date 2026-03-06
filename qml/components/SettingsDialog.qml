@@ -7,8 +7,8 @@ Dialog {
     id: settingsRoot
     title: "Settings"
     anchors.centerIn: parent
-    width: 560
-    height: 720
+    width: 600
+    height: 800
     modal: true
     standardButtons: Dialog.Ok | Dialog.Cancel
 
@@ -19,6 +19,8 @@ Dialog {
     }
 
     onOpened: {
+        apiModeLocal.checked = (AppSettings.apiMode === "local")
+        apiModeCloud.checked = (AppSettings.apiMode === "cloud")
         urlField.text = AppSettings.ollamaUrl
         apiKeyField.text = AppSettings.apiKey
         fontSizeSpinner.value = AppSettings.fontSize
@@ -27,6 +29,7 @@ Dialog {
     }
 
     onAccepted: {
+        AppSettings.apiMode = apiModeCloud.checked ? "cloud" : "local"
         AppSettings.ollamaUrl = urlField.text
         AppSettings.apiKey = apiKeyField.text.trim()
         AppSettings.fontSize = fontSizeSpinner.value
@@ -148,6 +151,64 @@ Dialog {
             }
 
             RowLayout {
+                spacing: Theme.spacingMd
+                Layout.fillWidth: true
+
+                Text {
+                    text: "API Mode:"
+                    font.pixelSize: Theme.fontSizeNormal
+                    color: Theme.textSecondary
+                    Layout.preferredWidth: 120
+                }
+
+                RadioButton {
+                    id: apiModeLocal
+                    text: "Local"
+                    checked: true
+                    contentItem: Text {
+                        text: parent.text
+                        font.pixelSize: Theme.fontSizeNormal
+                        color: Theme.textPrimary
+                        leftPadding: parent.indicator.width + parent.spacing
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onCheckedChanged: {
+                        if (checked) {
+                            urlField.placeholderText = "http://localhost:11434"
+                        }
+                    }
+                }
+
+                RadioButton {
+                    id: apiModeCloud
+                    text: "Cloud (OpenAI-compatible)"
+                    contentItem: Text {
+                        text: parent.text
+                        font.pixelSize: Theme.fontSizeNormal
+                        color: Theme.textPrimary
+                        leftPadding: parent.indicator.width + parent.spacing
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onCheckedChanged: {
+                        if (checked) {
+                            urlField.placeholderText = "https://api.ollama.ai/v1"
+                        }
+                    }
+                }
+            }
+
+            Text {
+                text: apiModeCloud.checked
+                      ? "Cloud mode uses OpenAI-compatible endpoints (/v1/chat/completions). An API key is required."
+                      : "Local mode uses native Ollama endpoints (/api/chat). No API key needed."
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.textMuted
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
+                Layout.leftMargin: 124
+            }
+
+            RowLayout {
                 spacing: Theme.spacingSm
                 Layout.fillWidth: true
 
@@ -224,9 +285,11 @@ Dialog {
             }
 
             Text {
-                text: "Required for Ollama Cloud or remote servers that use Bearer token auth."
+                text: apiModeCloud.checked
+                      ? "Required for Ollama Cloud. Sent as 'Authorization: Bearer <key>'."
+                      : "Optional. Only needed if your local Ollama instance requires authentication."
                 font.pixelSize: Theme.fontSizeSmall
-                color: Theme.textMuted
+                color: apiModeCloud.checked ? Theme.warning : Theme.textMuted
                 wrapMode: Text.Wrap
                 Layout.fillWidth: true
                 Layout.leftMargin: 124

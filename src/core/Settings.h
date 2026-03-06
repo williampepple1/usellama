@@ -17,6 +17,7 @@ class Settings : public QObject
     Q_PROPERTY(int contextLength READ contextLength WRITE setContextLength NOTIFY contextLengthChanged)
     Q_PROPERTY(bool hasApiKey READ hasApiKey NOTIFY apiKeyChanged)
     Q_PROPERTY(QString colorTheme READ colorTheme WRITE setColorTheme NOTIFY colorThemeChanged)
+    Q_PROPERTY(QString apiMode READ apiMode WRITE setApiMode NOTIFY apiModeChanged)
 
 public:
     explicit Settings(QObject *parent = nullptr);
@@ -43,6 +44,9 @@ public:
     QString colorTheme() const;
     void setColorTheme(const QString &theme);
 
+    QString apiMode() const;
+    void setApiMode(const QString &mode);
+
 signals:
     void ollamaUrlChanged();
     void apiKeyChanged();
@@ -51,6 +55,7 @@ signals:
     void temperatureChanged();
     void contextLengthChanged();
     void colorThemeChanged();
+    void apiModeChanged();
 
 private:
     QSettings m_settings;
