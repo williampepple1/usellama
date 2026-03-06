@@ -22,6 +22,15 @@ void OllamaClient::setBaseUrl(const QString &url)
     }
 }
 
+void OllamaClient::setApiKey(const QString &key)
+{
+    if (m_apiKey != key) {
+        m_apiKey = key;
+        emit apiKeyChanged();
+        checkConnection();
+    }
+}
+
 void OllamaClient::setCurrentModel(const QString &model)
 {
     if (m_currentModel != model) {
@@ -35,9 +44,17 @@ QUrl OllamaClient::apiUrl(const QString &endpoint) const
     return QUrl(m_baseUrl + endpoint);
 }
 
+void OllamaClient::applyAuth(QNetworkRequest &req) const
+{
+    if (!m_apiKey.isEmpty()) {
+        req.setRawHeader("Authorization", ("Bearer " + m_apiKey).toUtf8());
+    }
+}
+
 void OllamaClient::checkConnection()
 {
     QNetworkRequest req(apiUrl("/api/tags"));
+    applyAuth(req);
     QNetworkReply *reply = m_nam->get(req);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         reply->deleteLater();
@@ -53,6 +70,7 @@ void OllamaClient::checkConnection()
 void OllamaClient::fetchModels()
 {
     QNetworkRequest req(apiUrl("/api/tags"));
+    applyAuth(req);
     QNetworkReply *reply = m_nam->get(req);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         reply->deleteLater();
@@ -86,6 +104,7 @@ void OllamaClient::sendChatMessage(const QJsonArray &messages, const QJsonArray 
 
     QNetworkRequest req(apiUrl("/api/chat"));
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    applyAuth(req);
 
     m_streamBuffer.clear();
     m_accumulatedContent.clear();

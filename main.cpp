@@ -38,8 +38,12 @@ int main(int argc, char *argv[])
     agentEngine->setAgentTools(agentTools);
 
     ollamaClient->setBaseUrl(settings->ollamaUrl());
+    ollamaClient->setApiKey(settings->apiKey());
     QObject::connect(settings, &Settings::ollamaUrlChanged, ollamaClient, [settings, ollamaClient]() {
         ollamaClient->setBaseUrl(settings->ollamaUrl());
+    });
+    QObject::connect(settings, &Settings::apiKeyChanged, ollamaClient, [settings, ollamaClient]() {
+        ollamaClient->setApiKey(settings->apiKey());
     });
     QObject::connect(ollamaClient, &OllamaClient::availableModelsChanged, modelListModel, [ollamaClient, modelListModel]() {
         modelListModel->setModels(ollamaClient->availableModels());

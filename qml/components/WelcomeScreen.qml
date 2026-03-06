@@ -84,6 +84,11 @@ Rectangle {
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.textMuted
                 }
+                Text {
+                    text: AppSettings.hasApiKey ? "\u{1F511} API key configured" : "\u{1F513} No API key (local mode)"
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: AppSettings.hasApiKey ? Theme.info : Theme.textMuted
+                }
             }
         }
 

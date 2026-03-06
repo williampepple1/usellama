@@ -16,6 +16,7 @@ class OllamaClient : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QString baseUrl READ baseUrl WRITE setBaseUrl NOTIFY baseUrlChanged)
+    Q_PROPERTY(QString apiKey READ apiKey WRITE setApiKey NOTIFY apiKeyChanged)
     Q_PROPERTY(bool connected READ isConnected NOTIFY connectedChanged)
     Q_PROPERTY(QStringList availableModels READ availableModels NOTIFY availableModelsChanged)
     Q_PROPERTY(QString currentModel READ currentModel WRITE setCurrentModel NOTIFY currentModelChanged)
@@ -25,6 +26,9 @@ public:
 
     QString baseUrl() const { return m_baseUrl; }
     void setBaseUrl(const QString &url);
+
+    QString apiKey() const { return m_apiKey; }
+    void setApiKey(const QString &key);
 
     bool isConnected() const { return m_connected; }
 
@@ -42,6 +46,7 @@ public:
 
 signals:
     void baseUrlChanged();
+    void apiKeyChanged();
     void connectedChanged();
     void availableModelsChanged();
     void currentModelChanged();
@@ -56,10 +61,12 @@ private slots:
 
 private:
     QUrl apiUrl(const QString &endpoint) const;
+    void applyAuth(QNetworkRequest &req) const;
 
     QNetworkAccessManager *m_nam;
     QNetworkReply *m_activeReply = nullptr;
     QString m_baseUrl;
+    QString m_apiKey;
     bool m_connected = false;
     QStringList m_availableModels;
     QString m_currentModel;

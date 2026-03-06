@@ -19,6 +19,24 @@ void Settings::setOllamaUrl(const QString &url)
     }
 }
 
+QString Settings::apiKey() const
+{
+    return m_settings.value("ollama/apiKey", "").toString();
+}
+
+void Settings::setApiKey(const QString &key)
+{
+    if (apiKey() != key) {
+        m_settings.setValue("ollama/apiKey", key);
+        emit apiKeyChanged();
+    }
+}
+
+bool Settings::hasApiKey() const
+{
+    return !apiKey().isEmpty();
+}
+
 QString Settings::defaultModel() const
 {
     return m_settings.value("ollama/defaultModel", "").toString();

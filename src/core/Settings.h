@@ -10,16 +10,22 @@ class Settings : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QString ollamaUrl READ ollamaUrl WRITE setOllamaUrl NOTIFY ollamaUrlChanged)
+    Q_PROPERTY(QString apiKey READ apiKey WRITE setApiKey NOTIFY apiKeyChanged)
     Q_PROPERTY(QString defaultModel READ defaultModel WRITE setDefaultModel NOTIFY defaultModelChanged)
     Q_PROPERTY(int fontSize READ fontSize WRITE setFontSize NOTIFY fontSizeChanged)
     Q_PROPERTY(double temperature READ temperature WRITE setTemperature NOTIFY temperatureChanged)
     Q_PROPERTY(int contextLength READ contextLength WRITE setContextLength NOTIFY contextLengthChanged)
+    Q_PROPERTY(bool hasApiKey READ hasApiKey NOTIFY apiKeyChanged)
 
 public:
     explicit Settings(QObject *parent = nullptr);
 
     QString ollamaUrl() const;
     void setOllamaUrl(const QString &url);
+
+    QString apiKey() const;
+    void setApiKey(const QString &key);
+    bool hasApiKey() const;
 
     QString defaultModel() const;
     void setDefaultModel(const QString &model);
@@ -35,6 +41,7 @@ public:
 
 signals:
     void ollamaUrlChanged();
+    void apiKeyChanged();
     void defaultModelChanged();
     void fontSizeChanged();
     void temperatureChanged();
