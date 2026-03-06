@@ -1,9 +1,8 @@
 pragma Singleton
 import QtQuick
-import usellama
 
 QtObject {
-    property string currentTheme: AppSettings.colorTheme
+    property string currentTheme: "grey"
 
     property color bgPrimary: _schemes[currentTheme].bgPrimary
     property color bgSecondary: _schemes[currentTheme].bgSecondary
@@ -61,6 +60,11 @@ QtObject {
     readonly property int chatPanelWidth: 380
     readonly property int statusBarHeight: 28
     readonly property int tabBarHeight: 36
+
+    function setTheme(name) {
+        if (_schemes.hasOwnProperty(name))
+            currentTheme = name
+    }
 
     readonly property var themeNames: [
         "grey", "midnight", "emerald", "rose",
@@ -312,11 +316,4 @@ QtObject {
             borderFocused:"#0066cc"
         }
     })
-
-    Connections {
-        target: AppSettings
-        function onColorThemeChanged() {
-            currentTheme = AppSettings.colorTheme
-        }
-    }
 }

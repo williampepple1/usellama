@@ -21,6 +21,7 @@ ApplicationWindow {
     property bool showTerminal: false
 
     Component.onCompleted: {
+        Theme.setTheme(AppSettings.colorTheme)
         OllamaClient.checkConnection()
         if (startupFolder && startupFolder.length > 0) {
             root.workspacePath = startupFolder
@@ -29,6 +30,13 @@ ApplicationWindow {
             if (startupFile && startupFile.length > 0) {
                 Qt.callLater(function() { editorArea.openFile(startupFile) })
             }
+        }
+    }
+
+    Connections {
+        target: AppSettings
+        function onColorThemeChanged() {
+            Theme.setTheme(AppSettings.colorTheme)
         }
     }
 
