@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import usellama
-import "theme"
 import "components"
 
 ApplicationWindow {
@@ -61,7 +60,8 @@ ApplicationWindow {
             } else {
                 filePath = filePath.replace("file://", "")
             }
-            let folderPath = filePath.substring(0, filePath.lastIndexOf(Qt.platform.os === "windows" ? "/" : "/"))
+            let lastSlash = filePath.lastIndexOf("/")
+            let folderPath = filePath.substring(0, lastSlash)
             if (!root.workspacePath || root.workspacePath.length === 0) {
                 root.workspacePath = folderPath
                 FileSystemManager.setRootPath(folderPath)
@@ -172,7 +172,12 @@ ApplicationWindow {
         fileMode: FileDialog.SaveFile
         nameFilters: ["JSON files (*.json)"]
         onAccepted: {
-            let path = selectedFile.toString().replace("file:///", "")
+            let path = selectedFile.toString()
+            if (Qt.platform.os === "windows") {
+                path = path.replace("file:///", "")
+            } else {
+                path = path.replace("file://", "")
+            }
             AgentEngine.saveChatHistory(path)
         }
     }
@@ -183,7 +188,12 @@ ApplicationWindow {
         fileMode: FileDialog.OpenFile
         nameFilters: ["JSON files (*.json)"]
         onAccepted: {
-            let path = selectedFile.toString().replace("file:///", "")
+            let path = selectedFile.toString()
+            if (Qt.platform.os === "windows") {
+                path = path.replace("file:///", "")
+            } else {
+                path = path.replace("file://", "")
+            }
             AgentEngine.loadChatHistory(path)
         }
     }
@@ -320,6 +330,7 @@ ApplicationWindow {
                     }
 
                     function closeFile(path) {
+                        tabBar.removeTab(path)
                         editorArea.clearEditor()
                     }
                 }

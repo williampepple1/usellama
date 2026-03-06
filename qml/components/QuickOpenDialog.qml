@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import usellama
-import "../theme"
 
 Popup {
     id: quickOpen
@@ -184,7 +183,7 @@ Popup {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                height: parent.parent.children[0].background.radius
+                height: Theme.radiusLg
                 color: parent.color
             }
 

@@ -87,7 +87,7 @@ bool FileSystemManager::editFile(const QString &path, const QString &oldText, co
 QVariantList FileSystemManager::searchFiles(const QString &directory, const QString &pattern) const
 {
     QVariantList results;
-    QRegularExpression regex(pattern);
+    QRegularExpression regex(QRegularExpression::escape(pattern));
     QDirIterator it(directory, QDir::Files, QDirIterator::Subdirectories);
 
     int maxResults = 100;

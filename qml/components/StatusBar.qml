@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import usellama
-import "../theme"
 
 Rectangle {
     id: statusBarRoot
@@ -45,7 +44,7 @@ Rectangle {
         }
 
         Text {
-            text: "UseLlama v0.1"
+            text: "UseLlama v1.0.0"
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.textInverse
             opacity: 0.8

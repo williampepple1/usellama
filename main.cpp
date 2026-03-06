@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
         modelListModel->setModels(ollamaClient->availableModels());
     });
     QObject::connect(fileSystemManager, &FileSystemManager::rootPathChanged, fileTreeModel, [fileSystemManager, fileTreeModel]() {
+        
         fileTreeModel->setRootDirectory(fileSystemManager->rootPath());
     });
     QObject::connect(fileSystemManager, &FileSystemManager::rootPathChanged, terminalProcess, [fileSystemManager, terminalProcess]() {

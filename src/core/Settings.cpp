@@ -87,3 +87,16 @@ void Settings::setContextLength(int length)
         emit contextLengthChanged();
     }
 }
+
+QString Settings::colorTheme() const
+{
+    return m_settings.value("appearance/colorTheme", "grey").toString();
+}
+
+void Settings::setColorTheme(const QString &theme)
+{
+    if (colorTheme() != theme) {
+        m_settings.setValue("appearance/colorTheme", theme);
+        emit colorThemeChanged();
+    }
+}

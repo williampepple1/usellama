@@ -16,6 +16,7 @@ class Settings : public QObject
     Q_PROPERTY(double temperature READ temperature WRITE setTemperature NOTIFY temperatureChanged)
     Q_PROPERTY(int contextLength READ contextLength WRITE setContextLength NOTIFY contextLengthChanged)
     Q_PROPERTY(bool hasApiKey READ hasApiKey NOTIFY apiKeyChanged)
+    Q_PROPERTY(QString colorTheme READ colorTheme WRITE setColorTheme NOTIFY colorThemeChanged)
 
 public:
     explicit Settings(QObject *parent = nullptr);
@@ -39,6 +40,9 @@ public:
     int contextLength() const;
     void setContextLength(int length);
 
+    QString colorTheme() const;
+    void setColorTheme(const QString &theme);
+
 signals:
     void ollamaUrlChanged();
     void apiKeyChanged();
@@ -46,6 +50,7 @@ signals:
     void fontSizeChanged();
     void temperatureChanged();
     void contextLengthChanged();
+    void colorThemeChanged();
 
 private:
     QSettings m_settings;
