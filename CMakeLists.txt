@@ -41,6 +41,10 @@ if (WIN32)
     list(APPEND PROJECT_SOURCES app_icon.rc)
 endif()
 
+if(WIN32)
+    list(APPEND PROJECT_SOURCES app_icon.rc)
+endif()
+
 qt_add_executable(appusellama ${PROJECT_SOURCES})
 
 qt_add_qml_module(appusellama

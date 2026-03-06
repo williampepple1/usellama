@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QIcon>
 
 #include "src/core/OllamaClient.h"
 #include "src/core/FileSystemManager.h"
@@ -20,6 +21,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("UseLlama");
     app.setOrganizationName("UseLlama");
     app.setApplicationVersion("0.1");
+    app.setWindowIcon(QIcon(":/app_icon.png"));
 
     auto *settings = new Settings(&app);
     auto *ollamaClient = new OllamaClient(&app);
